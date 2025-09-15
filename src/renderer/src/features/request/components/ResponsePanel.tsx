@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, Paper, TextField } from '@mui/material';
+import React from 'react'
+import { Box, Typography, Paper, TextField } from '@mui/material'
 
 const ResponsePanel: React.FC = () => {
   return (
@@ -33,12 +33,12 @@ const ResponsePanel: React.FC = () => {
   }
 }'
           InputProps={{
-            readOnly: true,
+            readOnly: true
           }}
         />
       </Paper>
     </Box>
-  );
-};
+  )
+}
 
-export default ResponsePanel;
+export default ResponsePanel

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
+import React from 'react'
+import { Box, Typography, List, ListItem, ListItemText } from '@mui/material'
 
 const Collection: React.FC = () => {
   return (
@@ -19,7 +19,7 @@ const Collection: React.FC = () => {
         </ListItem>
       </List>
     </Box>
-  );
-};
+  )
+}
 
-export default Collection;
+export default Collection

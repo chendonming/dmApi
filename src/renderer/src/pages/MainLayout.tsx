@@ -1,33 +1,49 @@
-import React from 'react';
-import { Grid } from '@mui/material';
-import Collection from '../features/collection';
-import RequestPanel from '../features/request/components/RequestPanel';
-import ResponsePanel from '../features/request/components/ResponsePanel';
+import React from 'react'
+import { Box, IconButton } from '@mui/material'
+import { Brightness4, Brightness7 } from '@mui/icons-material'
+import Collection from '../features/collection'
+import RequestPanel from '../features/request/components/RequestPanel'
+import ResponsePanel from '../features/request/components/ResponsePanel'
 
-const MainLayout: React.FC = () => {
+interface MainLayoutProps {
+  toggleTheme: () => void
+  isDarkMode: boolean
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
   return (
-    <Grid container spacing={0} sx={{ height: '100vh' }}>
-      {/* 左侧集合面板 */}
-      <Grid item xs={3} sx={{ borderRight: '1px solid #ddd' }}>
-        <Collection />
-      </Grid>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* 顶部工具栏 */}
+      <Box sx={{ display: 'flex', alignItems: 'center', p: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <IconButton onClick={toggleTheme} color="inherit">
+          {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+        </IconButton>
+      </Box>
 
-      {/* 右侧请求/响应面板 */}
-      <Grid item xs={9}>
-        <Grid container direction="column" spacing={0} sx={{ height: '100%' }}>
-          {/* 上部请求面板 */}
-          <Grid item sx={{ flex: 1, borderBottom: '1px solid #ddd' }}>
-            <RequestPanel />
-          </Grid>
+      {/* 主体内容 */}
+      <Box sx={{ display: 'flex', flex: 1 }}>
+        {/* 左侧集合面板 */}
+        <Box sx={{ flex: '0 0 25%', borderRight: '1px solid', borderColor: 'divider' }}>
+          <Collection />
+        </Box>
 
-          {/* 下部响应面板 */}
-          <Grid item sx={{ flex: 1 }}>
-            <ResponsePanel />
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
-  );
-};
+        {/* 右侧请求/响应面板 */}
+        <Box sx={{ flex: '0 0 75%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* 上部请求面板 */}
+            <Box sx={{ flex: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+              <RequestPanel />
+            </Box>
 
-export default MainLayout;
+            {/* 下部响应面板 */}
+            <Box sx={{ flex: 1 }}>
+              <ResponsePanel />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default MainLayout

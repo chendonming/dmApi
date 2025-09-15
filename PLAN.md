@@ -70,15 +70,15 @@ src/renderer/
 
 根据状态的作用域，我们采用分层策略：
 
-| 状态类型 | 描述 | 使用工具 | 示例 |
-| :--- | :--- | :--- | :--- |
-| **全局应用状态** | 跨多个功能模块共享，影响整个应用行为的状态。 | **Zustand (主 Store)** | 当前激活的环境ID (`activeEnvironmentId`)、应用主题 (亮/暗模式)、打开的标签页列表。 |
-| **功能/领域状态** | 某个复杂功能模块内部共享的状态。 | **Zustand (Slice模式)** | 整个 Collection 的树状数据、某个复杂表单的全部状态。 |
-| **本地组件状态** | 仅限单个组件或其少数子组件使用的状态。 | **`useState`, `useReducer`** | 输入框的值、开关是否打开、一个组件内部的加载状态。 |
+| 状态类型          | 描述                                         | 使用工具                     | 示例                                                                               |
+| :---------------- | :------------------------------------------- | :--------------------------- | :--------------------------------------------------------------------------------- |
+| **全局应用状态**  | 跨多个功能模块共享，影响整个应用行为的状态。 | **Zustand (主 Store)**       | 当前激活的环境ID (`activeEnvironmentId`)、应用主题 (亮/暗模式)、打开的标签页列表。 |
+| **功能/领域状态** | 某个复杂功能模块内部共享的状态。             | **Zustand (Slice模式)**      | 整个 Collection 的树状数据、某个复杂表单的全部状态。                               |
+| **本地组件状态**  | 仅限单个组件或其少数子组件使用的状态。       | **`useState`, `useReducer`** | 输入框的值、开关是否打开、一个组件内部的加载状态。                                 |
 
 **原则**: **状态就近原则**。能用本地状态解决的，就绝不提升到全局状态，避免不必要的复杂性和性能开销。
 
-### 数据流与后端通信 (Data Flow & Backend Communication)**
+### 数据流与后端通信 (Data Flow & Backend Communication)\*\*
 
 前端（渲染进程）与后端（主进程）的通信**唯一**途径是 **IPC (Inter-Process Communication)**，并由 Preload 脚本作为安全的桥梁。
 
@@ -93,30 +93,30 @@ src/renderer/
        +------------------------------------- (Update UI with data/loading/error state) <----------------------+
 ```
 
-*   **`useIpcRequest` Hook**: 这个 Hook 将负责处理 IPC 调用的生命周期，包括 `loading`, `error`, `data` 等状态。组件只需调用这个 Hook 即可，无需关心底层的 IPC 实现细节。
-*   **类型安全**: 主进程、Preload 脚本和渲染进程之间共享类型定义，确保所有 IPC 通信都是类型安全的。
+- **`useIpcRequest` Hook**: 这个 Hook 将负责处理 IPC 调用的生命周期，包括 `loading`, `error`, `data` 等状态。组件只需调用这个 Hook 即可，无需关心底层的 IPC 实现细节。
+- **类型安全**: 主进程、Preload 脚本和渲染进程之间共享类型定义，确保所有 IPC 通信都是类型安全的。
 
-### 自定义Hooks (Custom Hooks)**
+### 自定义Hooks (Custom Hooks)\*\*
 
 自定义 Hooks 是我们封装和复用逻辑的主要手段。除了 `useIpcRequest`，我们还将创建：
 
-*   `useActiveTab`: 方便地获取和更新当前激活标签页的数据。
-*   `useDebounce`: 用于处理输入防抖，如自动保存功能。
-*   `useKeyPress`: 用于添加全局快捷键。
-*   `useAppSettings`: 用于读写持久化的用户偏好设置。
+- `useActiveTab`: 方便地获取和更新当前激活标签页的数据。
+- `useDebounce`: 用于处理输入防抖，如自动保存功能。
+- `useKeyPress`: 用于添加全局快捷键。
+- `useAppSettings`: 用于读写持久化的用户偏好设置。
 
-### 样式方案 (Styling Strategy)**
+### 样式方案 (Styling Strategy)\*\*
 
 我们完全拥抱 MUI 提供的样式方案，以保持风格统一和开发高效。
 
-*   **`sx` Prop**: 用于快速实现一次性的、小范围的样式定制。它提供了对主题的直接访问，非常便捷。
-    ```jsx
-    <Box sx={{ p: 2, border: '1px dashed grey' }}>...</Box>
-    ```
-*   **`styled()` 工具**: 用于创建可复用的、带有复杂样式的自定义组件。当一个样式逻辑需要在多处使用时，应该将其封装成一个 `styled` 组件。
-    ```jsx
-    const CustomButton = styled(Button)(({ theme }) => ({
-      backgroundColor: theme.palette.secondary.main,
-    }));
-    ```
-*   **主题定制**: 所有颜色、字体、间距等设计规范都将在 `styles/theme.ts` 文件中统一配置，确保整个应用视觉上的一致性。
+- **`sx` Prop**: 用于快速实现一次性的、小范围的样式定制。它提供了对主题的直接访问，非常便捷。
+  ```jsx
+  <Box sx={{ p: 2, border: '1px dashed grey' }}>...</Box>
+  ```
+- **`styled()` 工具**: 用于创建可复用的、带有复杂样式的自定义组件。当一个样式逻辑需要在多处使用时，应该将其封装成一个 `styled` 组件。
+  ```jsx
+  const CustomButton = styled(Button)(({ theme }) => ({
+    backgroundColor: theme.palette.secondary.main
+  }))
+  ```
+- **主题定制**: 所有颜色、字体、间距等设计规范都将在 `styles/theme.ts` 文件中统一配置，确保整个应用视觉上的一致性。
