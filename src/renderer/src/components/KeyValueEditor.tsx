@@ -47,6 +47,10 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
     setEditing({ rowIndex, col })
   }
 
+  const handleInput = (e: React.FormEvent<HTMLDivElement>): void => {
+    setTempValue(e.currentTarget.textContent || '')
+  }
+
   const handleSave = (): void => {
     if (editing) {
       const updated = value.map((item, i) =>
@@ -75,6 +79,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
 
   useEffect(() => {
     if (editing && editRef.current) {
+      editRef.current.textContent = tempValue
       editRef.current.focus()
       // Move cursor to end
       const range = document.createRange()
@@ -84,7 +89,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
       selection?.removeAllRanges()
       selection?.addRange(range)
     }
-  }, [editing])
+  }, [editing, tempValue])
 
   const renderCell = (rowIndex: number, col: 'key' | 'value', text: string): React.ReactElement => {
     const isEditing = editing && editing.rowIndex === rowIndex && editing.col === col
@@ -111,12 +116,10 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
             overflowWrap: 'break-word',
             maxWidth: '100%'
           }}
-          onInput={(e) => setTempValue(e.currentTarget.textContent || '')}
+          onInput={handleInput}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-        >
-          {tempValue}
-        </Box>
+        />
       )
     }
 
