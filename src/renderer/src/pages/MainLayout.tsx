@@ -40,12 +40,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
         </Box>
 
         {/* 主体内容 */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, height: 0 }}>
           {/* 左侧集合面板 - 大屏幕显示 */}
           <Box
             sx={{
               display: { xs: 'none', md: 'block' },
-              flex: '0 0 25%',
+              flex: '0 0 250px',
               borderRight: '1px solid',
               borderColor: 'divider'
             }}
@@ -54,7 +54,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
           </Box>
 
           {/* 右侧请求/响应面板 */}
-          <Box sx={{ flex: { xs: '1', md: '0 0 75%' } }}>
+          <Box sx={{ flex: 1, width: 0 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               {/* 上部请求面板 */}
               <Box sx={{ flex: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
@@ -62,7 +62,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
               </Box>
 
               {/* 下部响应面板 */}
-              <Box sx={{ flex: 1 }}>
+              <Box sx={{ flex: 1, height: 0 }}>
                 <ResponsePanel />
               </Box>
             </Box>

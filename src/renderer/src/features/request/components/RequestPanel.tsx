@@ -56,12 +56,12 @@ const RequestPanel: React.FC = () => {
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* 第一行：方法选择、URL输入、发送按钮 */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         <Select
           value={method}
           onChange={(e) => setMethod(e.target.value)}
           size="small"
-          sx={{ minWidth: 100 }}
+          sx={{ flex: '0 0 auto', minWidth: { xs: 70, sm: 80, md: 100 } }}
         >
           <MenuItem value="GET">GET</MenuItem>
           <MenuItem value="POST">POST</MenuItem>
@@ -75,10 +75,14 @@ const RequestPanel: React.FC = () => {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter request URL"
-          fullWidth
           size="small"
+          sx={{ flex: 1, minWidth: 0 }}
         />
-        <Button variant="contained" onClick={handleSend}>
+        <Button
+          variant="contained"
+          onClick={handleSend}
+          sx={{ flex: '0 0 auto', minWidth: { xs: 60, sm: 70, md: 80 } }}
+        >
           Send
         </Button>
       </Box>
