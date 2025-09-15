@@ -12,9 +12,17 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       {/* 顶部工具栏 */}
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 1,
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
         <IconButton onClick={toggleTheme} color="inherit">
           {isDarkMode ? <Brightness7 /> : <Brightness4 />}
         </IconButton>

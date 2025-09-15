@@ -1,75 +1,108 @@
 import React, { useState } from 'react'
-import { Box, Tabs, Tab, Typography, TextField, Button } from '@mui/material'
-
-interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
-}
-
-function TabPanel(props: TabPanelProps): React.ReactElement {
-  const { children, value, index, ...other } = props
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`request-tabpanel-${index}`}
-      aria-labelledby={`request-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  )
-}
+import {
+  Box,
+  Select,
+  MenuItem,
+  TextField,
+  Button,
+  Tabs,
+  Tab,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel
+} from '@mui/material'
+import KeyValueEditor, { KeyValuePair } from '../../../components/KeyValueEditor'
 
 const RequestPanel: React.FC = () => {
-  const [value, setValue] = useState(0)
+  const [method, setMethod] = useState('GET')
+  const [url, setUrl] = useState('')
+  const [tabValue, setTabValue] = useState(0)
+  const [params, setParams] = useState<KeyValuePair[]>([])
+  const [auth, setAuth] = useState<KeyValuePair[]>([])
+  const [bodyType, setBodyType] = useState<
+    'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'binary'
+  >('none')
+  const [bodyValues, setBodyValues] = useState<KeyValuePair[]>([])
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: number): void => {
-    setValue(newValue)
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number): void => {
+    setTabValue(newValue)
+  }
+
+  const handleSend = (): void => {
+    // TODO: Implement send request logic
+    console.log('Send request:', { method, url, params, auth, bodyType, bodyValues })
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="request tabs">
-          <Tab label="GET" />
-          <Tab label="POST" />
-          <Tab label="PUT" />
-          <Tab label="DELETE" />
-        </Tabs>
+    <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* 第一行：方法选择、URL输入、发送按钮 */}
+      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+        <Select
+          value={method}
+          onChange={(e) => setMethod(e.target.value)}
+          size="small"
+          sx={{ minWidth: 100 }}
+        >
+          <MenuItem value="GET">GET</MenuItem>
+          <MenuItem value="POST">POST</MenuItem>
+          <MenuItem value="PUT">PUT</MenuItem>
+          <MenuItem value="DELETE">DELETE</MenuItem>
+          <MenuItem value="PATCH">PATCH</MenuItem>
+          <MenuItem value="HEAD">HEAD</MenuItem>
+          <MenuItem value="OPTIONS">OPTIONS</MenuItem>
+        </Select>
+        <TextField
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter request URL"
+          fullWidth
+          size="small"
+        />
+        <Button variant="contained" onClick={handleSend}>
+          Send
+        </Button>
       </Box>
-      <TabPanel value={value} index={0}>
-        <Typography variant="h6">GET 请求</Typography>
-        <TextField label="URL" fullWidth margin="normal" />
-        <Button variant="contained" color="primary">
-          发送请求
-        </Button>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Typography variant="h6">POST 请求</Typography>
-        <TextField label="URL" fullWidth margin="normal" />
-        <TextField label="Body" multiline rows={4} fullWidth margin="normal" />
-        <Button variant="contained" color="primary">
-          发送请求
-        </Button>
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <Typography variant="h6">PUT 请求</Typography>
-        <TextField label="URL" fullWidth margin="normal" />
-        <TextField label="Body" multiline rows={4} fullWidth margin="normal" />
-        <Button variant="contained" color="primary">
-          发送请求
-        </Button>
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        <Typography variant="h6">DELETE 请求</Typography>
-        <TextField label="URL" fullWidth margin="normal" />
-        <Button variant="contained" color="primary">
-          发送请求
-        </Button>
-      </TabPanel>
+
+      {/* 参数标签页 */}
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
+        sx={{ borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab label="Params" />
+        <Tab label="Auth" />
+        <Tab label="Body" />
+      </Tabs>
+
+      <Box sx={{ flex: 1, overflow: 'auto', mt: 2 }}>
+        {tabValue === 0 && <KeyValueEditor value={params} onChange={setParams} />}
+        {tabValue === 1 && <KeyValueEditor value={auth} onChange={setAuth} />}
+        {tabValue === 2 && (
+          <Box>
+            <FormControl component="fieldset" sx={{ mb: 2 }}>
+              <FormLabel component="legend">Body Type</FormLabel>
+              <RadioGroup
+                row
+                value={bodyType}
+                onChange={(e) => setBodyType(e.target.value as typeof bodyType)}
+              >
+                <FormControlLabel value="none" control={<Radio />} label="none" />
+                <FormControlLabel value="form-data" control={<Radio />} label="form-data" />
+                <FormControlLabel
+                  value="x-www-form-urlencoded"
+                  control={<Radio />}
+                  label="x-www-form-urlencoded"
+                />
+                <FormControlLabel value="raw" control={<Radio />} label="raw" />
+                <FormControlLabel value="binary" control={<Radio />} label="binary" />
+              </RadioGroup>
+            </FormControl>
+            <KeyValueEditor value={bodyValues} onChange={setBodyValues} />
+          </Box>
+        )}
+      </Box>
     </Box>
   )
 }

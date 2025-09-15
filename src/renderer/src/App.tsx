@@ -10,7 +10,7 @@ import '@fontsource/roboto/700.css'
 function App(): React.JSX.Element {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
-  const toggleTheme = () => {
+  const toggleTheme = (): void => {
     setIsDarkMode(!isDarkMode)
   }
 
