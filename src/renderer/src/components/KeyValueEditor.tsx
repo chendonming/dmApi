@@ -1,11 +1,10 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  TextField,
   Button,
   IconButton,
   Box
@@ -23,7 +22,16 @@ interface KeyValueEditorProps {
   onChange: (value: KeyValuePair[]) => void
 }
 
+interface EditingCell {
+  rowIndex: number
+  col: 'key' | 'value'
+}
+
 const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
+  const [editing, setEditing] = useState<EditingCell | null>(null)
+  const [tempValue, setTempValue] = useState('')
+  const editRef = useRef<HTMLDivElement>(null)
+
   const handleAdd = (): void => {
     onChange([...value, { key: '', value: '' }])
   }
@@ -33,9 +41,112 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
     onChange(newValue)
   }
 
-  const handleChange = (index: number, field: 'key' | 'value', newValue: string): void => {
-    const updated = value.map((item, i) => (i === index ? { ...item, [field]: newValue } : item))
-    onChange(updated)
+  const handleCellClick = (rowIndex: number, col: 'key' | 'value'): void => {
+    const currentText = value[rowIndex][col]
+    setTempValue(currentText)
+    setEditing({ rowIndex, col })
+  }
+
+  const handleSave = (): void => {
+    if (editing) {
+      const updated = value.map((item, i) =>
+        i === editing.rowIndex ? { ...item, [editing.col]: tempValue.trim() } : item
+      )
+      onChange(updated)
+      setEditing(null)
+      setTempValue('')
+    }
+  }
+
+  const handleCancel = (): void => {
+    setEditing(null)
+    setTempValue('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSave()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancel()
+    }
+  }
+
+  useEffect(() => {
+    if (editing && editRef.current) {
+      editRef.current.focus()
+      // Move cursor to end
+      const range = document.createRange()
+      const selection = window.getSelection()
+      range.selectNodeContents(editRef.current)
+      range.collapse(false)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    }
+  }, [editing])
+
+  const renderCell = (rowIndex: number, col: 'key' | 'value', text: string): React.ReactElement => {
+    const isEditing = editing && editing.rowIndex === rowIndex && editing.col === col
+
+    if (isEditing) {
+      return (
+        <Box
+          ref={editRef}
+          component="div"
+          contentEditable
+          suppressContentEditableWarning
+          sx={{
+            cursor: 'text',
+            minHeight: '32px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            padding: '8.5px 14px',
+            borderRadius: '4px',
+            outline: 'none',
+            border: '1px solid #1976d2',
+            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            overflowWrap: 'break-word',
+            maxWidth: '100%'
+          }}
+          onInput={(e) => setTempValue(e.currentTarget.textContent || '')}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+        >
+          {tempValue}
+        </Box>
+      )
+    }
+
+    return (
+      <Box
+        component="div"
+        sx={{
+          cursor: 'pointer',
+          minHeight: '32px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          padding: '8.5px 14px',
+          borderRadius: '4px',
+          outline: 'none',
+          border: '1px solid transparent',
+          backgroundColor: 'transparent',
+          color: text ? 'text.primary' : 'text.secondary',
+          wordWrap: 'break-word',
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'break-word',
+          maxWidth: '100%',
+          '&:hover': {
+            backgroundColor: 'action.hover'
+          }
+        }}
+        onClick={() => handleCellClick(rowIndex, col)}
+      >
+        {text || (col === 'key' ? 'Click to add key' : 'Click to add value')}
+      </Box>
+    )
   }
 
   return (
@@ -43,29 +154,19 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Key</TableCell>
-            <TableCell>Value</TableCell>
+            <TableCell sx={{ width: '40%' }}>Key</TableCell>
+            <TableCell sx={{ width: '60%' }}>Value</TableCell>
             <TableCell width="50px"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {value.map((pair, index) => (
             <TableRow key={index}>
-              <TableCell>
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={pair.key}
-                  onChange={(e) => handleChange(index, 'key', e.target.value)}
-                />
+              <TableCell sx={{ p: 1 }}>
+                {renderCell(index, 'key', pair.key)}
               </TableCell>
-              <TableCell>
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={pair.value}
-                  onChange={(e) => handleChange(index, 'value', e.target.value)}
-                />
+              <TableCell sx={{ p: 1 }}>
+                {renderCell(index, 'value', pair.value)}
               </TableCell>
               <TableCell>
                 <IconButton size="small" onClick={() => handleDelete(index)}>
@@ -76,7 +177,12 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
           ))}
         </TableBody>
       </Table>
-      <Button startIcon={<AddIcon />} onClick={handleAdd} sx={{ mt: 1 }} size="small">
+      <Button
+        startIcon={<AddIcon />}
+        onClick={handleAdd}
+        sx={{ mt: 1 }}
+        size="small"
+      >
         Add
       </Button>
     </Box>
