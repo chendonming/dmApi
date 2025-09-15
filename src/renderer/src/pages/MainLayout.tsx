@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from 'react'
 import { Box, IconButton, Drawer } from '@mui/material'
 import { Brightness4, Brightness7, Menu } from '@mui/icons-material'
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels'
 import Collection from '../features/collection'
 import RequestPanel from '../features/request/components/RequestPanel'
 import ResponsePanel from '../features/request/components/ResponsePanel'
@@ -55,17 +56,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
 
           {/* 右侧请求/响应面板 */}
           <Box sx={{ flex: 1, width: 0 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <PanelGroup direction="vertical" style={{ height: '100%' }}>
               {/* 上部请求面板 */}
-              <Box sx={{ flex: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Panel defaultSize={50} minSize={20}>
                 <RequestPanel />
-              </Box>
+              </Panel>
+
+              <PanelResizeHandle style={{ height: '4px', backgroundColor: '#e0e0e0' }} />
 
               {/* 下部响应面板 */}
-              <Box sx={{ flex: 1, height: 0 }}>
+              <Panel defaultSize={50} minSize={20}>
                 <ResponsePanel />
-              </Box>
-            </Box>
+              </Panel>
+            </PanelGroup>
           </Box>
         </Box>
       </Box>
