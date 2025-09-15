@@ -3,6 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+// 导入后端架构模块
+import { logger } from './core/logger'
+import { registerRequestHandlers } from './handlers/requestHandler'
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -51,6 +55,12 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  // 注册请求 IPC handlers
+  registerRequestHandlers()
+
+  // 初始化日志
+  logger.info('Application started')
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({

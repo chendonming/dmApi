@@ -120,3 +120,55 @@ src/renderer/
   }))
   ```
 - **主题定制**: 所有颜色、字体、间距等设计规范都将在 `styles/theme.ts` 文件中统一配置，确保整个应用视觉上的一致性。
+
+## 后端架构
+
+### **架构风格：分层架构 + 模块化 (Layered Architecture & Modularity)**
+
+我们将采用经典的分层架构，将主进程的职责清晰地划分开，每一层都有明确的边界和单一职责。
+
+```
++-----------------------------------+
+|       IPC Handler Layer           |  (IPC 处理层)
+|  (e.g., request.handler.ts)       |  - 接收渲染进程的IPC调用
++-----------------------------------+  - 校验和转换数据
+|         Service Layer             |  (服务层)
+|  (e.g., request.service.ts)       |  - 实现核心业务逻辑
++-----------------------------------+  - 协调不同的数据源和模块
+|          Data Layer               |  (数据层 / Repository)
+|  (e.g., request.repository.ts)    |  - 封装数据库操作
++-----------------------------------+  - 提供CRUD接口
+|          Core Modules             |  (核心模块)
+|  (e.g., Database, Logger,         |  - 提供底层能力
+|   RequestManager, WindowManager)  |
++-----------------------------------+
+```
+
+**示例流程：保存一个请求**
+
+1.  **渲染进程** 调用 `window.electronAPI.saveRequest(requestData)`。
+2.  **IPC Handler Layer** (`ipc.ts`) 中的 `ipcMain.handle('save-request', ...)` 接收到请求，对 `requestData` 进行基本校验。
+3.  IPC Handler 调用 **Service Layer** 的 `RequestService.save(requestData)`。
+4.  `RequestService` 实现业务逻辑，比如检查请求名称是否重复、生成 ID、设置创建时间等。
+5.  `RequestService` 调用 **Data Layer** 的 `RequestRepository.update(id, data)` 或 `.create(data)`。
+6.  `RequestRepository` 将业务对象转换成数据库行，并使用 **Core Module** (`Database`) 执行具体的 SQL 语句。
+
+### **如何满足 SOLID 五大设计原则？**
+
+- **S (单一职责原则 - Single Responsibility Principle)**:
+  - 每一层、每个模块都只做一件事。`Repository` 只管数据库，`Service` 只管业务逻辑，`IPC Handler` 只管通信。`RequestManager` 只管调度请求客户端。
+
+- **O (开放封闭原则 - Open/Closed Principle)**:
+  - 我们的 `RequestManager` 设计是完美的例子。对于新增协议（如 WebSocket），我们**无需修改** `RequestManager` 的代码，只需**新增**一个 `WebSocketClient` 实现 `IRequestClient` 接口即可。系统对扩展是开放的，对修改是封闭的。数据库迁移机制也是如此。
+
+- **L (里氏替换原则 - Liskov Substitution Principle)**:
+  - `HttpClient` 和未来任何新的请求客户端都必须完全遵循 `IRequestClient` 接口的契约。任何一个子类实例都可以无差别地替换父类（接口）的实例，而不会产生任何错误。
+
+- **I (接口隔离原则 - Interface Segregation Principle)**:
+  - 我们将创建专门的、精简的接口。例如，`IRequestClient` 接口只定义了发送请求所必需的 `send` 和 `supports` 方法，不会包含与 HTTP 或 WebSocket 特定的方法，避免了接口的“污染”。
+
+- **D (依赖倒置原则 - Dependency Inversion Principle)**:
+  - **高层模块不应依赖于低层模块，二者都应依赖于抽象（接口）。**
+  - `RequestManager` (高层) 不直接依赖 `HttpClient` (低层)，而是依赖 `IRequestClient` (抽象)。
+  - `Service` 层不直接依赖 `better-sqlite3`，而是依赖我们自己定义的 `Repository` 接口。
+  - 这使得我们可以轻松地替换底层实现（比如未来把 SQLite 换成其他数据库），或者在测试中 Mock 掉依赖。我们将使用**依赖注入 (Dependency Injection)** 的思想，虽然不一定需要 DI 框架，但会在应用启动时手动“注入”依赖实例。
