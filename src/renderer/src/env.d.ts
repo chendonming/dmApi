@@ -14,3 +14,11 @@ export interface ResponseData {
   headers: Record<string, string>
   data: string
 }
+
+export interface AppResponse {
+  status: number
+  statusText: string
+  headers: Record<string, string>
+  rawBody: string
+  formattedBody: string
+}

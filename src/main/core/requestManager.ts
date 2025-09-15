@@ -1,9 +1,9 @@
 // 基础 HTTP 请求管理模块
-import { IRequestClient, RequestData, ResponseData } from './interfaces'
+import { IRequestClient, RequestData, AppResponse } from './interfaces'
 import { HttpClient } from './httpClient'
 
 // 重新导出类型，便于其他模块导入
-export type { RequestData, ResponseData }
+export type { RequestData, AppResponse }
 
 class RequestManager {
   private clients: IRequestClient[] = []
@@ -12,7 +12,7 @@ class RequestManager {
     this.clients.push(new HttpClient())
   }
 
-  async sendRequest(request: RequestData): Promise<ResponseData> {
+  async sendRequest(request: RequestData): Promise<AppResponse> {
     const url = new URL(request.url)
     const protocol = url.protocol.replace(':', '')
 

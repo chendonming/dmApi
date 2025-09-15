@@ -67,7 +67,7 @@ const ResponsePanel: React.FC = () => {
               </Typography>
             </Box>
             <Typography variant="subtitle2" color={getTimeColor()}>
-              大小: {data.data?.length || 0} 字节
+              大小: {data.formattedBody?.length || 0} 字节
             </Typography>
           </Box>
 
@@ -98,7 +98,7 @@ const ResponsePanel: React.FC = () => {
           {tabValue === 1 && (
             <Box sx={{ mt: 2 }}>
               <Editor
-                value={data.data || '(空响应)'}
+                value={data.formattedBody || '(空响应)'}
                 onChange={() => {}} // 只读，不需要onChange
                 language={getLanguage(getContentType(data.headers))}
                 height="300px"

@@ -13,7 +13,15 @@ export interface ResponseData {
   data: string
 }
 
+export interface AppResponse {
+  status: number
+  statusText: string
+  headers: Record<string, string>
+  rawBody: string
+  formattedBody: string
+}
+
 export interface IRequestClient {
   supports(protocol: string): boolean
-  send(request: RequestData): Promise<ResponseData>
+  send(request: RequestData): Promise<AppResponse>
 }

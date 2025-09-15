@@ -1,10 +1,10 @@
 import { useRequestStore } from '../store'
-import { RequestData, ResponseData } from '../env.d'
+import { RequestData, AppResponse } from '../env.d'
 import { KeyValuePair } from '../components/KeyValueEditor'
 
 export interface UseIpcRequestReturn {
   loading: boolean
-  data: ResponseData | null
+  data: AppResponse | null
   error: string | null
   sendRequest: (requestData: RequestData) => Promise<void>
   reset: () => void

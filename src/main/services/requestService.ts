@@ -1,11 +1,11 @@
 // 服务层：请求服务
 import { logger } from '../core/logger'
 import { requestManager } from '../core/requestManager'
-import { RequestData, ResponseData } from '../core/interfaces'
+import { RequestData, AppResponse } from '../core/interfaces'
 import { database } from '../core/database'
 
 class RequestService {
-  async sendRequest(requestData: RequestData): Promise<ResponseData> {
+  async sendRequest(requestData: RequestData): Promise<AppResponse> {
     logger.info(`Sending request: ${requestData.method} ${requestData.url}`)
 
     // 调用 RequestManager 发送请求

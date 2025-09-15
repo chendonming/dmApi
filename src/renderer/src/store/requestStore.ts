@@ -1,10 +1,10 @@
 import { create } from 'zustand'
-import { RequestData, ResponseData } from '../env.d'
+import { RequestData, AppResponse } from '../env.d'
 
 interface RequestState {
   // 请求状态
   loading: boolean
-  data: ResponseData | null
+  data: AppResponse | null
   error: string | null
 
   // 请求历史
@@ -12,7 +12,7 @@ interface RequestState {
     id: string
     timestamp: Date
     request: RequestData
-    response: ResponseData | null
+    response: AppResponse | null
     error: string | null
   }>
 }
@@ -28,7 +28,7 @@ interface RequestActions {
   clearHistory: () => void
 
   // 添加到历史
-  addToHistory: (request: RequestData, response: ResponseData | null, error: string | null) => void
+  addToHistory: (request: RequestData, response: AppResponse | null, error: string | null) => void
 }
 
 type RequestStore = RequestState & RequestActions
@@ -71,7 +71,7 @@ export const useRequestStore = create<RequestStore>((set, get) => ({
   },
 
   // 添加到历史
-  addToHistory: (request: RequestData, response: ResponseData | null, error: string | null) => {
+  addToHistory: (request: RequestData, response: AppResponse | null, error: string | null) => {
     const newHistoryItem = {
       id: Date.now().toString(),
       timestamp: new Date(),
