@@ -1,5 +1,6 @@
 import React from 'react'
-import { Box, Typography, Paper, TextField } from '@mui/material'
+import { Box, Typography, Paper } from '@mui/material'
+import Editor from '../../../components/Editor'
 
 const ResponsePanel: React.FC = () => {
   return (
@@ -20,19 +21,17 @@ const ResponsePanel: React.FC = () => {
         <Typography variant="body2" sx={{ mt: 2 }}>
           响应内容预览:
         </Typography>
-        <TextField
-          multiline
-          fullWidth
-          rows={10}
-          variant="outlined"
-          sx={{ mt: 1 }}
-          value='{
+        <Editor
+          value={`{
   "status": "success",
   "data": {
     "message": "这是示例响应数据"
   }
-}'
-          InputProps={{
+}`}
+          onChange={() => {}} // 只读，不需要onChange
+          language="json"
+          height="300px"
+          options={{
             readOnly: true
           }}
         />

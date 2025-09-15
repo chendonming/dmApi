@@ -1,12 +1,12 @@
 import React from 'react'
 import Editor from '@monaco-editor/react'
+import { useThemeStore } from '../../store'
 
 interface EditorProps {
   value: string
   onChange: (value: string | undefined) => void
   language?: string
   height?: string | number
-  theme?: string
   options?: React.ComponentProps<typeof Editor>['options']
 }
 
@@ -15,16 +15,17 @@ const CodeEditor: React.FC<EditorProps> = ({
   onChange,
   language = 'json',
   height = '200px',
-  theme = 'vs-dark',
   options = {}
 }) => {
+  const { editorTheme } = useThemeStore()
+
   return (
     <Editor
       value={value}
       onChange={onChange}
       language={language}
       height={height}
-      theme={theme}
+      theme={editorTheme}
       options={{
         minimap: { enabled: false },
         fontSize: 14,

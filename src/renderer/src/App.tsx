@@ -1,21 +1,17 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import MainLayout from './pages/MainLayout'
-import { lightTheme, darkTheme } from './styles/theme'
+import { useThemeStore } from './store'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
 function App(): React.JSX.Element {
-  const [isDarkMode, setIsDarkMode] = useState(false)
-
-  const toggleTheme = (): void => {
-    setIsDarkMode(!isDarkMode)
-  }
+  const { theme, toggleTheme, isDarkMode } = useThemeStore()
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <MainLayout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
     </ThemeProvider>
