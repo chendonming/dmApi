@@ -14,6 +14,7 @@ import {
   FormLabel
 } from '@mui/material'
 import KeyValueEditor, { KeyValuePair } from '../../../components/KeyValueEditor'
+import Editor from '../../../components/Editor'
 
 const RequestPanel: React.FC = () => {
   const [method, setMethod] = useState('GET')
@@ -35,6 +36,21 @@ const RequestPanel: React.FC = () => {
   const handleSend = (): void => {
     // TODO: Implement send request logic
     console.log('Send request:', { method, url, params, auth, bodyType, bodyValues })
+  }
+
+  const getLanguage = (type: typeof rawType): string => {
+    switch (type) {
+      case 'JSON':
+        return 'json'
+      case 'JavaScript':
+        return 'javascript'
+      case 'HTML':
+        return 'html'
+      case 'XML':
+        return 'xml'
+      default:
+        return 'text'
+    }
   }
 
   return (
@@ -119,13 +135,11 @@ const RequestPanel: React.FC = () => {
                   <MenuItem value="HTML">HTML</MenuItem>
                   <MenuItem value="XML">XML</MenuItem>
                 </Select>
-                <TextField
+                <Editor
                   value={rawContent}
-                  onChange={(e) => setRawContent(e.target.value)}
-                  multiline
-                  rows={10}
-                  fullWidth
-                  placeholder="Enter raw content"
+                  onChange={(value) => setRawContent(value || '')}
+                  language={getLanguage(rawType)}
+                  height="300px"
                 />
               </Box>
             )}
