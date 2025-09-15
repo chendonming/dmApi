@@ -101,7 +101,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
             minHeight: '32px',
             display: 'flex',
             alignItems: 'flex-start',
-            padding: '8.5px 14px',
+            padding: '8px 14px',
             borderRadius: '4px',
             outline: 'none',
             border: '1px solid #1976d2',
@@ -128,7 +128,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
           minHeight: '32px',
           display: 'flex',
           alignItems: 'flex-start',
-          padding: '8.5px 14px',
+          padding: '8px 14px',
           borderRadius: '4px',
           outline: 'none',
           border: '1px solid transparent',
@@ -154,20 +154,16 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: '40%' }}>Key</TableCell>
-            <TableCell sx={{ width: '60%' }}>Value</TableCell>
+            <TableCell sx={{ width: '50%' }}>Key</TableCell>
+            <TableCell sx={{ width: '50%' }}>Value</TableCell>
             <TableCell width="50px"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {value.map((pair, index) => (
             <TableRow key={index}>
-              <TableCell sx={{ p: 1 }}>
-                {renderCell(index, 'key', pair.key)}
-              </TableCell>
-              <TableCell sx={{ p: 1 }}>
-                {renderCell(index, 'value', pair.value)}
-              </TableCell>
+              <TableCell sx={{ p: 1 }}>{renderCell(index, 'key', pair.key)}</TableCell>
+              <TableCell sx={{ p: 1 }}>{renderCell(index, 'value', pair.value)}</TableCell>
               <TableCell>
                 <IconButton size="small" onClick={() => handleDelete(index)}>
                   <DeleteIcon />
@@ -177,12 +173,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
           ))}
         </TableBody>
       </Table>
-      <Button
-        startIcon={<AddIcon />}
-        onClick={handleAdd}
-        sx={{ mt: 1 }}
-        size="small"
-      >
+      <Button startIcon={<AddIcon />} onClick={handleAdd} sx={{ mt: 1 }} size="small">
         Add
       </Button>
     </Box>

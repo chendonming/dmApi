@@ -25,6 +25,8 @@ const RequestPanel: React.FC = () => {
     'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'binary'
   >('none')
   const [bodyValues, setBodyValues] = useState<KeyValuePair[]>([])
+  const [rawType, setRawType] = useState<'Text' | 'JavaScript' | 'JSON' | 'HTML' | 'XML'>('Text')
+  const [rawContent, setRawContent] = useState('')
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number): void => {
     setTabValue(newValue)
@@ -99,7 +101,40 @@ const RequestPanel: React.FC = () => {
                 <FormControlLabel value="binary" control={<Radio />} label="binary" />
               </RadioGroup>
             </FormControl>
-            <KeyValueEditor value={bodyValues} onChange={setBodyValues} />
+            {bodyType === 'none' && null}
+            {(bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') && (
+              <KeyValueEditor value={bodyValues} onChange={setBodyValues} />
+            )}
+            {bodyType === 'raw' && (
+              <Box>
+                <Select
+                  value={rawType}
+                  onChange={(e) => setRawType(e.target.value as typeof rawType)}
+                  size="small"
+                  sx={{ mb: 2, minWidth: 120 }}
+                >
+                  <MenuItem value="Text">Text</MenuItem>
+                  <MenuItem value="JavaScript">JavaScript</MenuItem>
+                  <MenuItem value="JSON">JSON</MenuItem>
+                  <MenuItem value="HTML">HTML</MenuItem>
+                  <MenuItem value="XML">XML</MenuItem>
+                </Select>
+                <TextField
+                  value={rawContent}
+                  onChange={(e) => setRawContent(e.target.value)}
+                  multiline
+                  rows={10}
+                  fullWidth
+                  placeholder="Enter raw content"
+                />
+              </Box>
+            )}
+            {bodyType === 'binary' && (
+              <Button variant="outlined" component="label">
+                Upload File
+                <input type="file" hidden />
+              </Button>
+            )}
           </Box>
         )}
       </Box>
