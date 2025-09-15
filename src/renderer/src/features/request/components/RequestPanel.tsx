@@ -11,10 +11,12 @@ import {
   FormControlLabel,
   Radio,
   FormControl,
-  FormLabel
+  FormLabel,
+  CircularProgress
 } from '@mui/material'
 import KeyValueEditor, { KeyValuePair } from '../../../components/KeyValueEditor'
 import Editor from '../../../components/Editor'
+import { useIpcRequest, formDataToRequestData, RequestFormData } from '../../../hooks/useIpcRequest'
 
 const RequestPanel: React.FC = () => {
   const [method, setMethod] = useState('GET')
@@ -29,13 +31,26 @@ const RequestPanel: React.FC = () => {
   const [rawType, setRawType] = useState<'Text' | 'JavaScript' | 'JSON' | 'HTML' | 'XML'>('Text')
   const [rawContent, setRawContent] = useState('')
 
+  const { loading, sendRequest, reset } = useIpcRequest()
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number): void => {
     setTabValue(newValue)
   }
 
-  const handleSend = (): void => {
-    // TODO: Implement send request logic
-    console.log('Send request:', { method, url, params, auth, bodyType, bodyValues })
+  const handleSend = async (): Promise<void> => {
+    const formData: RequestFormData = {
+      method,
+      url,
+      params,
+      auth,
+      bodyType,
+      bodyValues,
+      rawType,
+      rawContent
+    }
+
+    const requestData = formDataToRequestData(formData)
+    await sendRequest(requestData)
   }
 
   const getLanguage = (type: typeof rawType): string => {
@@ -81,9 +96,18 @@ const RequestPanel: React.FC = () => {
         <Button
           variant="contained"
           onClick={handleSend}
+          disabled={loading}
           sx={{ flex: '0 0 auto', minWidth: { xs: 60, sm: 70, md: 80 } }}
         >
-          Send
+          {loading ? <CircularProgress size={20} /> : 'Send'}
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={reset}
+          disabled={loading}
+          sx={{ flex: '0 0 auto', minWidth: { xs: 60, sm: 70, md: 80 } }}
+        >
+          Reset
         </Button>
       </Box>
 
