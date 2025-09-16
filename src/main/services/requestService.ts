@@ -56,7 +56,8 @@ class RequestService {
         response_status: response.status,
         response_headers: response.headers ? JSON.stringify(response.headers) : undefined,
         response_body: response.rawBody,
-        response_time: responseTime
+        response_time: responseTime,
+        executed_at: new Date().toISOString()
       } as any)
 
       return historyId

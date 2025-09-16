@@ -35,11 +35,11 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
   }
 
   protected getInsertColumns(): string {
-    return 'request_id, response_status, response_headers, response_body, response_time, executed_at, created_at, updated_at'
+    return 'request_id, response_status, response_headers, response_body, response_time, executed_at'
   }
 
   protected getInsertPlaceholders(): string {
-    return '?, ?, ?, ?, ?, ?, ?, ?'
+    return '?, ?, ?, ?, ?, ?'
   }
 
   protected getUpdateSetClause(): string {

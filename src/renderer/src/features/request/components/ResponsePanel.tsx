@@ -80,13 +80,13 @@ const ResponsePanel: React.FC = () => {
             <Box sx={{ mt: 2, mb: 2 }}>
               <Box
                 component="pre"
-                sx={{
+                sx={(theme) => ({
                   fontSize: '12px',
-                  backgroundColor: 'grey.100',
+                  backgroundColor: theme.palette.background.paper, // 使用主题背景色
                   p: 1,
                   borderRadius: 1,
                   overflow: 'auto'
-                }}
+                })}
               >
                 {Object.entries(data.headers)
                   .map(([key, value]) => `${key}: ${value}`)
