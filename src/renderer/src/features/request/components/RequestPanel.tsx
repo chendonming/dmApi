@@ -88,20 +88,22 @@ const RequestPanel: React.FC = () => {
           <MenuItem value="HEAD">HEAD</MenuItem>
           <MenuItem value="OPTIONS">OPTIONS</MenuItem>
         </Select>
-        <TextField
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter request URL"
-          size="small"
-          multiline={urlMultiline}
-          onFocus={() => {
-            setUrlMultiline(true)
-            setTimeout(() => urlInputRef.current?.focus(), 0)
-          }}
-          onBlur={() => setUrlMultiline(false)}
-          inputRef={urlInputRef}
-          sx={{ flex: 1, minWidth: 0 }}
-        />
+        <Box sx={{ flex: 1, minWidth: 0, position: 'relative', height: '40px' }}>
+          <TextField
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Enter request URL"
+            size="small"
+            multiline={urlMultiline}
+            onFocus={() => {
+              setUrlMultiline(true)
+              setTimeout(() => urlInputRef.current?.focus(), 0)
+            }}
+            onBlur={() => setUrlMultiline(false)}
+            inputRef={urlInputRef}
+            sx={{ position: 'absolute', top: 0, left: 0, right: 0, flex: 1, minWidth: 0 }}
+          />
+        </Box>
         <Button
           variant="contained"
           onClick={handleSend}
