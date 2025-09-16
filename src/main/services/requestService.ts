@@ -3,33 +3,115 @@ import { logger } from '../core/logger'
 import { requestManager } from '../core/requestManager'
 import { RequestData, AppResponse } from '../core/interfaces'
 import { database } from '../core/database'
+import { repositories } from '../repositories'
+import { RequestEntity, HistoryEntity } from '../core/types'
 
 class RequestService {
   async sendRequest(requestData: RequestData): Promise<AppResponse> {
     logger.info(`Sending request: ${requestData.method} ${requestData.url}`)
 
-    // 调用 RequestManager 发送请求
-    const response = await requestManager.sendRequest(requestData)
+    const startTime = Date.now()
 
-    logger.info(`Request completed with status: ${response.status}`)
+    try {
+      // 调用 RequestManager 发送请求
+      const response = await requestManager.sendRequest(requestData)
 
-    // TODO: 保存请求响应到数据库
-    // await database.query('INSERT INTO requests ...', [/* params */])
+      const responseTime = Date.now() - startTime
+      logger.info(`Request completed with status: ${response.status} in ${responseTime}ms`)
 
-    return response
+      // 使用事务保存请求历史
+      this.saveRequestHistory(requestData, response, responseTime)
+
+      return response
+    } catch (error) {
+      logger.error('Request failed:', error)
+      throw error
+    }
   }
 
-  async saveRequest(requestData: RequestData): Promise<void> {
-    // TODO: 实现保存请求逻辑
-    logger.info('Saving request (placeholder)')
-    // await database.query('INSERT INTO requests ...', [/* params */])
+  private saveRequestHistory(
+    requestData: RequestData,
+    response: AppResponse,
+    responseTime: number
+  ): void {
+    // 使用事务确保数据一致性
+    const result = database.transaction(() => {
+      // 查找或创建请求记录
+      let requestEntity = this.findRequestByUrlAndMethod(requestData.url, requestData.method as any)
+
+      if (!requestEntity) {
+        // 如果是临时请求，先保存到默认集合中
+        requestEntity = repositories.requests.create({
+          name: `${requestData.method} ${requestData.url}`,
+          url: requestData.url,
+          method: requestData.method as any,
+          headers: requestData.headers ? JSON.stringify(requestData.headers) : undefined,
+          body: requestData.body
+        } as any)
+      }
+
+      // 保存请求历史
+      const historyId = repositories.history.create({
+        request_id: requestEntity.id,
+        response_status: response.status,
+        response_headers: response.headers ? JSON.stringify(response.headers) : undefined,
+        response_body: response.rawBody,
+        response_time: responseTime
+      } as any)
+
+      return historyId
+    })
+
+    logger.info(`Request history saved with result: ${result}`)
   }
 
-  async getRequests(): Promise<any[]> {
-    // TODO: 获取请求列表
-    logger.info('Getting requests (placeholder)')
-    // return await database.query('SELECT * FROM requests')
-    return []
+  private findRequestByUrlAndMethod(url: string, method: string): RequestEntity | null {
+    // 这是一个简化的实现，实际应该在 Repository 中实现
+    const allRequests = repositories.requests.findAll()
+    return allRequests.find((req) => req.url === url && req.method === method) || null
+  }
+
+  async saveRequest(requestData: RequestData, _collectionId: number): Promise<RequestEntity> {
+    logger.info(`Saving request: ${requestData.method} ${requestData.url}`)
+
+    const requestEntity = repositories.requests.create({
+      name: `${requestData.method} ${requestData.url}`,
+      url: requestData.url,
+      method: requestData.method as any,
+      headers: requestData.headers ? JSON.stringify(requestData.headers) : undefined,
+      body: requestData.body
+    } as any)
+
+    logger.info(`Request saved with id: ${requestEntity.id}`)
+    return requestEntity
+  }
+
+  async getRequests(collectionId?: number): Promise<RequestEntity[]> {
+    logger.info(`Getting requests${collectionId ? ` for collection ${collectionId}` : ''}`)
+
+    if (collectionId) {
+      return repositories.requests.findByCollection(collectionId)
+    }
+
+    return repositories.requests.findAll()
+  }
+
+  async getRequestById(id: number): Promise<RequestEntity | null> {
+    return repositories.requests.findById(id)
+  }
+
+  async updateRequest(id: number, updates: Partial<RequestEntity>): Promise<RequestEntity | null> {
+    logger.info(`Updating request ${id}`)
+    return repositories.requests.update(id, updates)
+  }
+
+  async deleteRequest(id: number): Promise<boolean> {
+    logger.info(`Deleting request ${id}`)
+    return repositories.requests.delete(id)
+  }
+
+  async getRequestHistory(requestId: number): Promise<HistoryEntity[]> {
+    return repositories.history.findByRequest(requestId)
   }
 }
 

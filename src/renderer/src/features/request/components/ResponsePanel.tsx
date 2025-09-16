@@ -71,7 +71,7 @@ const ResponsePanel: React.FC = () => {
             </Typography>
           </Box>
 
-          <Tabs value={tabValue} onChange={(event, newValue) => setTabValue(newValue)}>
+          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
             <Tab label="响应头" />
             <Tab label="响应内容" />
           </Tabs>

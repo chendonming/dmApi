@@ -42,7 +42,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -55,6 +55,24 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  // 初始化数据库
+  try {
+    const { database } = await import('./core/database')
+    await database.init()
+
+    // 初始化默认数据
+    const { initializeDefaultData } = await import('./core/databaseInit')
+    await initializeDefaultData()
+
+    logger.info('Database initialized successfully')
+  } catch (error) {
+    logger.error('Failed to initialize database:', error)
+    // 在开发环境中不应该阻止应用启动
+    if (!is.dev) {
+      app.quit()
+    }
+  }
 
   // 注册请求 IPC handlers
   registerRequestHandlers()

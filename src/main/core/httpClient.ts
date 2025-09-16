@@ -1,5 +1,5 @@
 // HTTP 客户端实现
-import { IRequestClient, RequestData, ResponseData, AppResponse } from './interfaces'
+import { IRequestClient, RequestData, AppResponse } from './interfaces'
 import { logger } from './logger'
 import axios, { AxiosResponse } from 'axios'
 import prettier from 'prettier'

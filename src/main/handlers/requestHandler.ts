@@ -6,7 +6,7 @@ import { RequestData } from '../core/interfaces'
 
 export function registerRequestHandlers(): void {
   // 发送 HTTP 请求
-  ipcMain.handle('send-request', async (event, requestData: RequestData) => {
+  ipcMain.handle('send-request', async (_, requestData: RequestData) => {
     try {
       logger.info('IPC: Handling send-request')
       return await requestService.sendRequest(requestData)
@@ -17,11 +17,11 @@ export function registerRequestHandlers(): void {
   })
 
   // 保存请求
-  ipcMain.handle('save-request', async (event, requestData: RequestData) => {
+  ipcMain.handle('save-request', async (_, requestData: RequestData, collectionId: number = 1) => {
     try {
       logger.info('IPC: Handling save-request')
-      await requestService.saveRequest(requestData)
-      return { success: true }
+      const result = await requestService.saveRequest(requestData, collectionId)
+      return { success: true, data: result }
     } catch (error) {
       logger.error('IPC: save-request failed', error)
       throw error
