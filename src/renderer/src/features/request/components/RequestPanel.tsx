@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Box,
   Select,
@@ -17,12 +17,13 @@ import {
 import KeyValueEditor, { KeyValuePair } from '../../../components/KeyValueEditor'
 import Editor from '../../../components/Editor'
 import { useIpcRequest, formDataToRequestData, RequestFormData } from '../../../hooks/useIpcRequest'
+import { useRequestStore } from '../../../store/requestStore'
 
 const RequestPanel: React.FC = () => {
   const [method, setMethod] = useState('GET')
-  const [url, setUrl] = useState('')
+  const [urlMultiline, setUrlMultiline] = useState(false)
+  const urlInputRef = useRef<HTMLInputElement>(null)
   const [tabValue, setTabValue] = useState(0)
-  const [params, setParams] = useState<KeyValuePair[]>([])
   const [auth, setAuth] = useState<KeyValuePair[]>([])
   const [bodyType, setBodyType] = useState<
     'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'binary'
@@ -31,7 +32,8 @@ const RequestPanel: React.FC = () => {
   const [rawType, setRawType] = useState<'Text' | 'JavaScript' | 'JSON' | 'HTML' | 'XML'>('Text')
   const [rawContent, setRawContent] = useState('')
 
-  const { loading, sendRequest, reset } = useIpcRequest()
+  const { loading, sendRequest } = useIpcRequest()
+  const { url, params, setUrl, setParams } = useRequestStore()
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number): void => {
     setTabValue(newValue)
@@ -91,6 +93,13 @@ const RequestPanel: React.FC = () => {
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter request URL"
           size="small"
+          multiline={urlMultiline}
+          onFocus={() => {
+            setUrlMultiline(true)
+            setTimeout(() => urlInputRef.current?.focus(), 0)
+          }}
+          onBlur={() => setUrlMultiline(false)}
+          inputRef={urlInputRef}
           sx={{ flex: 1, minWidth: 0 }}
         />
         <Button
@@ -100,14 +109,6 @@ const RequestPanel: React.FC = () => {
           sx={{ flex: '0 0 auto', minWidth: { xs: 60, sm: 70, md: 80 } }}
         >
           {loading ? <CircularProgress size={20} /> : 'Send'}
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={reset}
-          disabled={loading}
-          sx={{ flex: '0 0 auto', minWidth: { xs: 60, sm: 70, md: 80 } }}
-        >
-          Reset
         </Button>
       </Box>
 
