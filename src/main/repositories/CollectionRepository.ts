@@ -10,24 +10,26 @@ export class CollectionRepository
     this.initStatements()
   }
 
-  protected mapRowToEntity(row: any): CollectionEntity {
+  protected mapRowToEntity(row: Record<string, unknown>): CollectionEntity {
     return {
-      id: row.id,
-      name: row.name,
-      description: row.description,
-      parent_id: row.parent_id,
-      created_at: row.created_at,
-      updated_at: row.updated_at
+      id: row.id as number,
+      name: row.name as string,
+      description: (row.description as string | null) || undefined,
+      parent_id: (row.parent_id as number | null) || undefined,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     }
   }
 
-  protected mapEntityToRow(
-    entity: Omit<CollectionEntity, 'id' | 'created_at' | 'updated_at'>
-  ): any {
+  protected mapEntityToRow(entity: Omit<CollectionEntity, 'id' | 'created_at' | 'updated_at'>): {
+    name: string
+    description: string | null
+    parent_id: number | null
+  } {
     return {
       name: entity.name,
-      description: entity.description,
-      parent_id: entity.parent_id
+      description: entity.description || null,
+      parent_id: entity.parent_id || null
     }
   }
 
@@ -64,7 +66,14 @@ export class CollectionRepository
   findByParent(parentId?: number): CollectionEntity[] {
     if (!this.findByParentStmt) this.initStatements()
     try {
-      const rows = this.findByParentStmt!.all(parentId ?? null) as any[]
+      const rows = this.findByParentStmt!.all(parentId ?? null) as Array<{
+        id: number
+        name: string
+        description: string | null
+        parent_id: number | null
+        created_at: string
+        updated_at: string
+      }>
       return rows.map((row) => this.mapRowToEntity(row))
     } catch (error) {
       logger.error('Error finding collections by parent:', error)
@@ -75,7 +84,15 @@ export class CollectionRepository
   findTree(): CollectionEntity[] {
     if (!this.findTreeStmt) this.initStatements()
     try {
-      const rows = this.findTreeStmt!.all() as any[]
+      const rows = this.findTreeStmt!.all() as Array<{
+        id: number
+        name: string
+        description: string | null
+        parent_id: number | null
+        created_at: string
+        updated_at: string
+        child_count: number
+      }>
       return rows.map(
         (row) =>
           ({

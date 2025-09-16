@@ -7,27 +7,34 @@ export class RequestRepository extends BaseRepository<RequestEntity> implements 
     this.initStatements()
   }
 
-  protected mapRowToEntity(row: any): RequestEntity {
+  protected mapRowToEntity(row: Record<string, unknown>): RequestEntity {
     return {
-      id: row.id,
-      name: row.name,
-      url: row.url,
-      method: row.method,
-      headers: row.headers,
-      body: row.body,
-      created_at: row.created_at,
-      updated_at: row.updated_at
+      id: row.id as number,
+      name: row.name as string,
+      url: row.url as string,
+      method: row.method as RequestEntity['method'],
+      headers: (row.headers as string | null) || undefined,
+      body: (row.body as string | null) || undefined,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     }
   }
 
-  protected mapEntityToRow(entity: Omit<RequestEntity, 'id' | 'created_at' | 'updated_at'>): any {
+  protected mapEntityToRow(entity: Omit<RequestEntity, 'id' | 'created_at' | 'updated_at'>): {
+    collection_id: number | null
+    name: string
+    url: string
+    method: string
+    headers: string | null
+    body: string | null
+  } {
     return {
-      collection_id: (entity as any).collection_id,
+      collection_id: (entity as any).collection_id || null,
       name: entity.name,
       url: entity.url,
       method: entity.method,
-      headers: entity.headers,
-      body: entity.body
+      headers: entity.headers || null,
+      body: entity.body || null
     }
   }
 
@@ -56,7 +63,16 @@ export class RequestRepository extends BaseRepository<RequestEntity> implements 
   findByCollection(collectionId: number): RequestEntity[] {
     if (!this.findByCollectionStmt) this.initStatements()
     try {
-      const rows = this.findByCollectionStmt!.all(collectionId) as any[]
+      const rows = this.findByCollectionStmt!.all(collectionId) as Array<{
+        id: number
+        name: string
+        url: string
+        method: string
+        headers: string | null
+        body: string | null
+        created_at: string
+        updated_at: string
+      }>
       return rows.map((row) => this.mapRowToEntity(row))
     } catch (error) {
       logger.error('Error finding requests by collection:', error)
@@ -73,8 +89,8 @@ export class RequestRepository extends BaseRepository<RequestEntity> implements 
       name: entity.name,
       url: entity.url,
       method: entity.method,
-      headers: entity.headers,
-      body: entity.body
+      headers: entity.headers || null,
+      body: entity.body || null
     }
     return super.create(row as any)
   }

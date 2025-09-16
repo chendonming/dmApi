@@ -11,8 +11,10 @@ export abstract class BaseRepository<T extends { id: number }> {
     this.tableName = tableName
   }
 
-  protected abstract mapRowToEntity(row: any): T
-  protected abstract mapEntityToRow(entity: Omit<T, 'id' | 'created_at' | 'updated_at'>): any
+  protected abstract mapRowToEntity(row: Record<string, unknown>): T
+  protected abstract mapEntityToRow(
+    entity: Omit<T, 'id' | 'created_at' | 'updated_at'>
+  ): Record<string, unknown>
 
   // 预处理的 SQL 语句
   private findByIdStmt: Database.Statement | null = null
@@ -48,7 +50,7 @@ export abstract class BaseRepository<T extends { id: number }> {
   findById(id: number): T | null {
     if (!this.findByIdStmt) this.initStatements()
     try {
-      const row = this.findByIdStmt!.get(id) as any
+      const row = this.findByIdStmt!.get(id) as Record<string, unknown> | undefined
       return row ? this.mapRowToEntity(row) : null
     } catch (error) {
       logger.error(`Error finding ${this.tableName} by id:`, error)
@@ -59,7 +61,7 @@ export abstract class BaseRepository<T extends { id: number }> {
   findAll(): T[] {
     if (!this.findAllStmt) this.initStatements()
     try {
-      const rows = this.findAllStmt!.all() as any[]
+      const rows = this.findAllStmt!.all() as Record<string, unknown>[]
       return rows.map((row) => this.mapRowToEntity(row))
     } catch (error) {
       logger.error(`Error finding all ${this.tableName}:`, error)
@@ -71,7 +73,9 @@ export abstract class BaseRepository<T extends { id: number }> {
     if (!this.insertStmt) this.initStatements()
     try {
       const row = this.mapEntityToRow(entity)
-      const result = this.insertStmt!.run(row)
+      // Convert object to array for positional placeholders
+      const values = Object.values(row)
+      const result = this.insertStmt!.run(values)
       const newEntity = {
         ...entity,
         id: result.lastInsertRowid as number,
@@ -92,7 +96,7 @@ export abstract class BaseRepository<T extends { id: number }> {
       const existing = this.findById(id)
       if (!existing) return null
 
-      const updateData = this.mapEntityToRow(entity as any)
+      const updateData = this.mapEntityToRow(entity as Omit<T, 'id' | 'created_at' | 'updated_at'>)
       const values = [...Object.values(updateData), id]
       this.updateStmt!.run(values)
 

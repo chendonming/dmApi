@@ -7,25 +7,31 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
     this.initStatements()
   }
 
-  protected mapRowToEntity(row: any): HistoryEntity {
+  protected mapRowToEntity(row: Record<string, unknown>): HistoryEntity {
     return {
-      id: row.id,
-      request_id: row.request_id,
-      response_status: row.response_status,
-      response_headers: row.response_headers,
-      response_body: row.response_body,
-      response_time: row.response_time,
-      executed_at: row.executed_at
+      id: row.id as number,
+      request_id: row.request_id as number,
+      response_status: (row.response_status as number | null) || undefined,
+      response_headers: (row.response_headers as string | null) || undefined,
+      response_body: (row.response_body as string | null) || undefined,
+      response_time: (row.response_time as number | null) || undefined,
+      executed_at: row.executed_at as string
     }
   }
 
-  protected mapEntityToRow(entity: Omit<HistoryEntity, 'id' | 'executed_at'>): any {
+  protected mapEntityToRow(entity: Omit<HistoryEntity, 'id' | 'executed_at'>): {
+    request_id: number
+    response_status: number | null
+    response_headers: string | null
+    response_body: string | null
+    response_time: number | null
+  } {
     return {
       request_id: entity.request_id,
-      response_status: entity.response_status,
-      response_headers: entity.response_headers,
-      response_body: entity.response_body,
-      response_time: entity.response_time
+      response_status: entity.response_status || null,
+      response_headers: entity.response_headers || null,
+      response_body: entity.response_body || null,
+      response_time: entity.response_time || null
     }
   }
 
@@ -62,7 +68,15 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
   findByRequest(requestId: number): HistoryEntity[] {
     if (!this.findByRequestStmt) this.initStatements()
     try {
-      const rows = this.findByRequestStmt!.all(requestId) as any[]
+      const rows = this.findByRequestStmt!.all(requestId) as Array<{
+        id: number
+        request_id: number
+        response_status: number | null
+        response_headers: string | null
+        response_body: string | null
+        response_time: number | null
+        executed_at: string
+      }>
       return rows.map((row) => this.mapRowToEntity(row))
     } catch (error) {
       logger.error('Error finding history by request:', error)
@@ -73,7 +87,16 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
   findRecent(limit: number): HistoryEntity[] {
     if (!this.findRecentStmt) this.initStatements()
     try {
-      const rows = this.findRecentStmt!.all(limit) as any[]
+      const rows = this.findRecentStmt!.all(limit) as Array<{
+        id: number
+        request_id: number
+        response_status: number | null
+        response_headers: string | null
+        response_body: string | null
+        response_time: number | null
+        executed_at: string
+        request_name: string
+      }>
       return rows.map(
         (row) =>
           ({

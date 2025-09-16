@@ -10,19 +10,20 @@ export class EnvironmentRepository
     this.initStatements()
   }
 
-  protected mapRowToEntity(row: any): EnvironmentEntity {
+  protected mapRowToEntity(row: Record<string, unknown>): EnvironmentEntity {
     return {
-      id: row.id,
-      name: row.name,
-      variables: row.variables,
-      created_at: row.created_at,
-      updated_at: row.updated_at
+      id: row.id as number,
+      name: row.name as string,
+      variables: row.variables as string,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     }
   }
 
-  protected mapEntityToRow(
-    entity: Omit<EnvironmentEntity, 'id' | 'created_at' | 'updated_at'>
-  ): any {
+  protected mapEntityToRow(entity: Omit<EnvironmentEntity, 'id' | 'created_at' | 'updated_at'>): {
+    name: string
+    variables: string
+  } {
     return {
       name: entity.name,
       variables: entity.variables
@@ -58,7 +59,15 @@ export class EnvironmentRepository
   findActive(): EnvironmentEntity | null {
     if (!this.findActiveStmt) this.initStatements()
     try {
-      const row = this.findActiveStmt!.get() as any
+      const row = this.findActiveStmt!.get() as
+        | {
+            id: number
+            name: string
+            variables: string
+            created_at: string
+            updated_at: string
+          }
+        | undefined
       return row ? this.mapRowToEntity(row) : null
     } catch (error) {
       logger.error('Error finding active environment:', error)

@@ -10,8 +10,6 @@ class DatabaseManager {
   private db: Database.Database | null = null
   private initialized = false
 
-  private constructor() {}
-
   static getInstance(): DatabaseManager {
     if (!DatabaseManager.instance) {
       DatabaseManager.instance = new DatabaseManager()
