@@ -36,6 +36,8 @@ export interface HistoryEntity {
   response_body?: string
   response_time?: number
   executed_at: string
+  created_at: string
+  updated_at: string
 }
 
 // Repository 接口定义

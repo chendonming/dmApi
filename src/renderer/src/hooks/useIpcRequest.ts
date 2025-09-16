@@ -15,6 +15,7 @@ export interface RequestFormData {
   url: string
   params: KeyValuePair[]
   auth: KeyValuePair[]
+  headers: KeyValuePair[]
   bodyType: 'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'binary'
   bodyValues: KeyValuePair[]
   rawType: 'Text' | 'JavaScript' | 'JSON' | 'HTML' | 'XML'
@@ -35,15 +36,22 @@ export const useIpcRequest = (): UseIpcRequestReturn => {
 
 // 辅助函数：将表单数据转换为RequestData
 export const formDataToRequestData = (formData: RequestFormData): RequestData => {
-  const { method, url, params, auth, bodyType, bodyValues, rawContent } = formData
+  const { method, url, params, auth, headers, bodyType, bodyValues, rawContent } = formData
 
   // 构建headers
-  const headers: Record<string, string> = {}
+  const requestHeaders: Record<string, string> = {}
+
+  // 添加headers
+  headers.forEach(({ key, value }) => {
+    if (key && value) {
+      requestHeaders[key] = value
+    }
+  })
 
   // 添加认证头
   auth.forEach(({ key, value }) => {
     if (key && value) {
-      headers[key] = value
+      requestHeaders[key] = value
     }
   })
 
@@ -74,19 +82,19 @@ export const formDataToRequestData = (formData: RequestFormData): RequestData =>
     body = formDataObj.toString()
 
     if (bodyType === 'form-data') {
-      headers['Content-Type'] = 'multipart/form-data'
+      requestHeaders['Content-Type'] = 'multipart/form-data'
     } else {
-      headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded'
     }
   } else if (bodyType === 'raw') {
     body = rawContent
-    headers['Content-Type'] = 'application/json' // 默认JSON，可根据rawType调整
+    requestHeaders['Content-Type'] = 'application/json' // 默认JSON，可根据rawType调整
   }
 
   return {
     method,
     url: fullUrl,
-    headers: Object.keys(headers).length > 0 ? headers : undefined,
+    headers: Object.keys(requestHeaders).length > 0 ? requestHeaders : undefined,
     body
   }
 }

@@ -25,6 +25,7 @@ const RequestPanel: React.FC = () => {
   const urlInputRef = useRef<HTMLInputElement>(null)
   const [tabValue, setTabValue] = useState(0)
   const [auth, setAuth] = useState<KeyValuePair[]>([])
+  const [headers, setHeaders] = useState<KeyValuePair[]>([])
   const [bodyType, setBodyType] = useState<
     'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'binary'
   >('none')
@@ -45,6 +46,7 @@ const RequestPanel: React.FC = () => {
       url,
       params,
       auth,
+      headers,
       bodyType,
       bodyValues,
       rawType,
@@ -122,13 +124,15 @@ const RequestPanel: React.FC = () => {
       >
         <Tab label="Params" />
         <Tab label="Auth" />
+        <Tab label="Headers" />
         <Tab label="Body" />
       </Tabs>
 
       <Box sx={{ flex: 1, overflow: 'auto', mt: 2 }}>
         {tabValue === 0 && <KeyValueEditor value={params} onChange={setParams} />}
         {tabValue === 1 && <KeyValueEditor value={auth} onChange={setAuth} />}
-        {tabValue === 2 && (
+        {tabValue === 2 && <KeyValueEditor value={headers} onChange={setHeaders} />}
+        {tabValue === 3 && (
           <Box>
             <FormControl component="fieldset" sx={{ mb: 2 }}>
               <FormLabel component="legend">Body Type</FormLabel>

@@ -106,6 +106,8 @@ class DatabaseManager {
         response_body TEXT,
         response_time INTEGER,
         executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (request_id) REFERENCES requests (id) ON DELETE CASCADE
       )
     `)
@@ -132,6 +134,14 @@ class DatabaseManager {
       AFTER UPDATE ON environments
       BEGIN
         UPDATE environments SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+      END
+    `)
+
+    this.db.exec(`
+      CREATE TRIGGER IF NOT EXISTS update_history_updated_at
+      AFTER UPDATE ON history
+      BEGIN
+        UPDATE history SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
       END
     `)
   }

@@ -15,36 +15,35 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
       response_headers: (row.response_headers as string | null) || undefined,
       response_body: (row.response_body as string | null) || undefined,
       response_time: (row.response_time as number | null) || undefined,
-      executed_at: row.executed_at as string
+      executed_at: row.executed_at as string,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     }
   }
 
-  protected mapEntityToRow(entity: Omit<HistoryEntity, 'id' | 'executed_at'>): {
-    request_id: number
-    response_status: number | null
-    response_headers: string | null
-    response_body: string | null
-    response_time: number | null
-  } {
+  protected mapEntityToRow(
+    entity: Omit<HistoryEntity, 'id' | 'created_at' | 'updated_at'>
+  ): Record<string, unknown> {
     return {
       request_id: entity.request_id,
       response_status: entity.response_status || null,
       response_headers: entity.response_headers || null,
       response_body: entity.response_body || null,
-      response_time: entity.response_time || null
+      response_time: entity.response_time || null,
+      executed_at: entity.executed_at
     }
   }
 
   protected getInsertColumns(): string {
-    return 'request_id, response_status, response_headers, response_body, response_time'
+    return 'request_id, response_status, response_headers, response_body, response_time, executed_at, created_at, updated_at'
   }
 
   protected getInsertPlaceholders(): string {
-    return '?, ?, ?, ?, ?'
+    return '?, ?, ?, ?, ?, ?, ?, ?'
   }
 
   protected getUpdateSetClause(): string {
-    return 'request_id = ?, response_status = ?, response_headers = ?, response_body = ?, response_time = ?'
+    return 'request_id = ?, response_status = ?, response_headers = ?, response_body = ?, response_time = ?, executed_at = ?'
   }
 
   // 额外的预处理语句
@@ -107,30 +106,6 @@ export class HistoryRepository extends BaseRepository<HistoryEntity> implements 
     } catch (error) {
       logger.error('Error finding recent history:', error)
       throw error
-    }
-  }
-
-  // 重写 create 方法，不需要 created_at/updated_at 字段
-  create(entity: Omit<HistoryEntity, 'id' | 'executed_at'>): HistoryEntity {
-    const row = this.mapEntityToRow(entity)
-    // 手动执行插入，因为基类期望 created_at/updated_at
-    const stmt = this.db.prepare(`
-      INSERT INTO history (request_id, response_status, response_headers, response_body, response_time, executed_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `)
-    const result = stmt.run(
-      row.request_id,
-      row.response_status,
-      row.response_headers,
-      row.response_body,
-      row.response_time,
-      new Date().toISOString()
-    )
-
-    return {
-      ...entity,
-      id: result.lastInsertRowid as number,
-      executed_at: new Date().toISOString()
     }
   }
 }
