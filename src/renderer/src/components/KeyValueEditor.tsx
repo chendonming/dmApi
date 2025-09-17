@@ -114,6 +114,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
             overflowWrap: 'break-word',
+            wordBreak: 'break-all',
             maxWidth: '100%'
           }}
           onInput={handleInput}
@@ -140,6 +141,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
           wordWrap: 'break-word',
           whiteSpace: 'pre-wrap',
           overflowWrap: 'break-word',
+          wordBreak: 'break-all',
           maxWidth: '100%',
           '&:hover': {
             backgroundColor: 'action.hover'
@@ -154,7 +156,7 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
 
   return (
     <Box>
-      <Table size="small">
+      <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
             <TableCell sx={{ width: '50%' }}>Key</TableCell>
