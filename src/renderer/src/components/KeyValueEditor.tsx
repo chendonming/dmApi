@@ -89,7 +89,8 @@ const KeyValueEditor: React.FC<KeyValueEditorProps> = ({ value, onChange }) => {
       selection?.removeAllRanges()
       selection?.addRange(range)
     }
-  }, [editing, tempValue])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing])
 
   const renderCell = (rowIndex: number, col: 'key' | 'value', text: string): React.ReactElement => {
     const isEditing = editing && editing.rowIndex === rowIndex && editing.col === col
