@@ -1,23 +1,26 @@
-import React from 'react'
-import { Box, Typography, List, ListItem, ListItemText } from '@mui/material'
+import React, { useState } from 'react'
+import { Box } from '@mui/material'
+import LeftSidebarTabs from '../../components/LeftSidebarTabs'
+import CollectionList from './CollectionList'
+import History from '../history'
 
 const Collection: React.FC = () => {
+  const [activeTab, setActiveTab] = useState(0)
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue)
+  }
+
   return (
-    <Box sx={{ p: 2, height: '100%', bgcolor: 'background.paper' }}>
-      <Typography variant="h6" gutterBottom>
-        集合
-      </Typography>
-      <List>
-        <ListItem>
-          <ListItemText primary="示例集合 1" />
-        </ListItem>
-        <ListItem>
-          <ListItemText primary="示例集合 2" />
-        </ListItem>
-        <ListItem>
-          <ListItemText primary="示例集合 3" />
-        </ListItem>
-      </List>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* 标签页 */}
+      <LeftSidebarTabs activeTab={activeTab} onTabChange={handleTabChange} />
+
+      {/* 内容区域 */}
+      <Box sx={{ flex: 1, overflow: 'hidden' }}>
+        {activeTab === 0 && <CollectionList />}
+        {activeTab === 1 && <History />}
+      </Box>
     </Box>
   )
 }

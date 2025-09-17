@@ -2,7 +2,7 @@ import React, { useState, Fragment } from 'react'
 import { Box, IconButton, Drawer } from '@mui/material'
 import { Brightness4, Brightness7, Menu } from '@mui/icons-material'
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels'
-import Collection from '../features/collection'
+import LeftSidebar from '../features/collection'
 import RequestPanel from '../features/request/components/RequestPanel'
 import ResponsePanel from '../features/request/components/ResponsePanel'
 
@@ -51,7 +51,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
               borderColor: 'divider'
             }}
           >
-            <Collection />
+            <LeftSidebar />
           </Box>
 
           {/* 右侧请求/响应面板 */}
@@ -81,7 +81,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ toggleTheme, isDarkMode }) => {
         ModalProps={{ keepMounted: true }}
       >
         <Box sx={{ width: 300 }}>
-          <Collection />
+          <LeftSidebar />
         </Box>
       </Drawer>
     </Fragment>

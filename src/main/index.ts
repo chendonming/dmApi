@@ -6,6 +6,8 @@ import icon from '../../resources/icon.png?asset'
 // 导入后端架构模块
 import { logger } from './core/logger'
 import { registerRequestHandlers } from './handlers/requestHandler'
+import { registerCollectionHandlers } from './handlers/collectionHandler'
+import { registerHistoryHandlers } from './handlers/historyHandler'
 
 function createWindow(): void {
   // Create the browser window.
@@ -74,8 +76,10 @@ app.whenReady().then(async () => {
     }
   }
 
-  // 注册请求 IPC handlers
+  // 注册 IPC handlers
   registerRequestHandlers()
+  registerCollectionHandlers()
+  registerHistoryHandlers()
 
   // 初始化日志
   logger.info('Application started')
